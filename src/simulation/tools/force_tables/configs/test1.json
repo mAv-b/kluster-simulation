@@ -1,0 +1,31 @@
+{
+    "units": "SI",
+    "magnet_a": {
+        "radius": 0.005,
+        "thickness": 0.003,
+        "magnetization": [0.0, 0.0, 100000.0]
+    },
+    "magnet_b": {
+        "radius": 0.005,
+        "thickness": 0.003,
+        "magnetization": [0.0, 0.0, 100000.0]
+    },
+    "grid": {
+        "dx": {
+            "min": 0.015,
+            "max": 0.06,
+            "count": 10
+        },
+        "dy": {
+            "min": -0.03,
+            "max": 0.03,
+            "count": 13
+        },
+        "dz": {
+            "min": 0.00,
+            "max": 0.00,
+            "count": 1
+        }
+    },
+    "output": "disk_force_table_text.npz"
+}
