@@ -60,9 +60,9 @@ class Magnet:
         ))
 
 
-    def force_with(self, magnet:Magnet) -> Vector3D:
+    def magnetic_force_with(self, magnet:Magnet) -> Vector3D:
 
-        magnetic_force_total = np.array((0.0,0.0,0.0))
+        magnetic_force_total = np.zeros(3)
         for piece in self.magnet_map:
             for target_piece in magnet.magnet_map:
                 piece.position += self.position

@@ -38,6 +38,11 @@ def export_positions_to_csv(npz_path, csv_path=None):
 
 main2()
 
+# CHECK:
+#  - Maybe the force-list is unnecessary
+#  - Check the interpolation method for multiple magnets and how interfer in HorizontalSurfaceMagnet's
+#    update_forces method
+
 # path = export_positions_to_csv("./src/data/meshes/test.npz")
 # print(f"CSV saved to: {path}")
 

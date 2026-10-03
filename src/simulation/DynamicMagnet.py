@@ -1,11 +1,13 @@
 import numpy as np
 
+from abc import ABC, abstractmethod
+
 from simulation.types import Vector3D, Force
+from .InterpolatedMagnet import InterpolatedMagnet
+from .tools.Interpolation import Interpolation
 
-from .Magnet import Magnet
 
-
-class DynamicMagnet(Magnet):
+class DynamicMagnet(InterpolatedMagnet, ABC):
     velocity:Vector3D
     angular_velocity:float
     plane_angle:float
@@ -22,9 +24,10 @@ class DynamicMagnet(Magnet):
             position: Vector3D,
             mass: float,
             moment_of_inertia: float,
+            interpolation: Interpolation
         ) -> None:
 
-        super().__init__(radius, thickness, magnetization, position)
+        super().__init__(radius, thickness, magnetization, position, interpolation)
 
         self.mass = mass
         self.moment_of_inertia = moment_of_inertia
@@ -84,6 +87,15 @@ class DynamicMagnet(Magnet):
         return np.linalg.norm(self.net_force) != 0
 
 
+    @abstractmethod
+    def update_forces(self, *args, **kwargs) -> list[Force]:
+        # UPDATE THE FORCES IN MAGNET, FOR EACH dt MOVED
+        raise NotImplementedError
+    
+
     def move_by_dt(self, dt:float):
         self.velocity += self.velocity + self.aceleration * dt
         self.position += self.position + self.velocity * dt
+
+        self.update_forces()
+    

@@ -109,7 +109,7 @@ def force_in_grid(position, magnets:list[Magnet]) -> Vector3D:
                     )
 
     magnet.position = position
-    vector_force = magnet.force_with(magnet=magnet_fixed)
+    vector_force = magnet.magnetic_force_with(magnet=magnet_fixed)
 
     return (
         np.dot(vector_force[0], e_x) +
