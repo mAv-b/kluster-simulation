@@ -4,8 +4,12 @@ from typing import Any
 
 import numpy as np
 
-from ...Magnet import Magnet
-from ...types import Vector3D, Array1D, Array2D
+from ...magnetism.Magnet import Magnet
+from ...types import (
+    Vector3D,
+    Array1D,
+    CarthesianCoordinates,
+)
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -26,7 +30,7 @@ def setup_configuration(config:dict[str,Any]):
 
     magnets = list(map(
         lambda key: Magnet(
-            position=np.array((0,0,0)),
+            position=CarthesianCoordinates(x=0,y=0,z=0),
             radius=float(config[key]['radius']),
             thickness=float(config[key]['thickness']),
             magnetization=np.array(config[key]['magnetization'])
@@ -39,9 +43,8 @@ def setup_configuration(config:dict[str,Any]):
 
     #temporary
     for magnet in magnets:
-        magnet.set_magnet_map(
-            mapping=magnet.mapping_pieces_magnet(n_pieces=10),
-            volume_by_piece=magnet.volume() / 10
+        magnet.set_magnet_map_in_carthesian_system(
+            mapping=magnet.mapping_pieces_magnet(n_pieces=10**3)
         )
 
     grid = config['grid']

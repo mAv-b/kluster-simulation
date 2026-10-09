@@ -3,19 +3,19 @@ from typing import Any
 
 import numpy as np
 
-ROOT = Path(__file__).resolve().parent.parent
+ROOT = Path(__file__).resolve().parent.parent.parent
 MESH_DIR = ROOT / 'data' / 'meshes'
 
 def save_mesh(
     mesh_id:str,
     positions:Any,
-    volume_by_position:float,
+    volumes:list[float],
     radius:float,
     thickness:float,
     resolution:float,
     method:str
 ) -> Path:
-    
+
     positions = np.asarray(positions, dtype=np.float64)
     if positions.ndim != 2 or positions.shape[1] != 3:
         raise ValueError('positions must have nx3 format')
@@ -28,7 +28,7 @@ def save_mesh(
         np.savez_compressed(
             file,
             positions=positions,
-            volume_by_position=volume_by_position,
+            volumes=volumes,
             radius=radius,
             thickness=thickness,
             resolution=resolution,
@@ -55,8 +55,17 @@ def load_mesh(mesh_id:str):
 
 
 def test():
-    with np.load(MESH_DIR / 'test.npz', allow_pickle=False) as data:
+    with np.load(MESH_DIR / 'test_cylindrical_method.npz', allow_pickle=False) as data:
         for name in data.files:
+            if name == 'volumes':
+                s = sum(
+                    map(
+                        lambda p: float(p),
+                        data[name]
+                    )
+                )
+                print(s)
+
             print(f"{name}:")
             print(data[name])
             print()

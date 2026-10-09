@@ -2,7 +2,12 @@ from pathlib import Path
 
 from scipy.interpolate import RegularGridInterpolator
 
-from ..types import Vector3D
+from ..types import (
+    Vector3D,
+    CylindricalCoordinates,
+    CarthesianCoordinates,
+    Coordinates3D
+)
 
 from .force_tables.main import (
     load_force_table
@@ -42,7 +47,7 @@ class Interpolation:
         return self.interpolator
 
 
-    def force_relative_at(self, rel_position:Vector3D) -> Vector3D:
+    def force_relative_at(self, rel_position:Coordinates3D) -> Vector3D:
         if self.interpolator is None:
             raise KeyError('interpolator not definied')
 

@@ -2,7 +2,7 @@ from math import pi
 
 import numpy as np
 
-from .types import Vector3D, DipoleOrientation
+from ..types import Vector3D, DipoleOrientation, Coordinates3D
 
 class PointDipole:
     VACUUM_PERMEABILITY = 4 * pi * 1e-7
@@ -10,7 +10,7 @@ class PointDipole:
 
     def __init__(
         self,
-        position:Vector3D,
+        position:Coordinates3D,
         magnetic_moment:Vector3D,
     ) -> None:
 
@@ -30,15 +30,18 @@ class PointDipole:
         try:
             orientation = DipoleOrientation(orientation_vector)
         except:
-            raise ValueError(f'invalid orientation vector for PointDipole: {self.__str__}; invalid orientation: {self.orientation}')
+            raise ValueError(f'invalid orientation vector for PointDipole: {self.__str__}; invalid orientation: {orientation_vector}')
 
         return orientation
 
     
-    def magnetic_field_at(self, position:Vector3D) -> Vector3D:
-        vector_displacement = position - self.position
+    def magnetic_field_at(self, position:Coordinates3D) -> Vector3D:
+        vector_displacement = position.to_vector3D() - self.position.to_vector3D()
 
         distance = np.linalg.norm(vector_displacement)
+        if distance == 0:
+            raise ValueError('Dipole Points is in same position...')
+
         versor_displacement = vector_displacement / distance
 
         magnetic_moment_displacement_direction:float = np.dot(self.magnetic_moment, versor_displacement)
@@ -51,9 +54,12 @@ class PointDipole:
 
 
     def interaction_energy_with(self, dipole:PointDipole) -> float:
-        vector_displacement = dipole.position - self.position
+        vector_displacement = dipole.position.to_vector3D() - self.position.to_vector3D()
 
         distance = np.linalg.norm(vector_displacement)
+        if distance == 0:
+            raise ValueError('Dipole Points is in same position...')
+
         versor_displacement = vector_displacement / distance
 
         dot_magnetic_moment = np.dot(
@@ -73,10 +79,12 @@ class PointDipole:
 
 
     def force_with(self, dipole:PointDipole) -> Vector3D:
-        print('\x1b[32m', f'origin:{self.position}; target:{dipole.position}', '\x1b[0m')
-        vector_displacement = dipole.position - self.position
+        vector_displacement = self.position.to_vector3D() - dipole.position.to_vector3D()
         
         distance = np.linalg.norm(vector_displacement)
+        if distance == 0:
+            raise ValueError('Dipole points is in same position')
+
         versor_displacement = vector_displacement / distance
 
         dot_magnetic_moment = np.dot(
@@ -100,7 +108,7 @@ class PointDipole:
 
 
     def force_from(self, dipole:PointDipole) -> Vector3D:
-        return (-1) * self.force_with(dipole) + (dipole.position - self.position)
+        return (-1) * self.force_with(dipole)
 
 
     def torque_in(self, dipole:PointDipole) -> Vector3D:

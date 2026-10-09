@@ -1,6 +1,7 @@
-from simulation.Magnet import Magnet
+from simulation.magnetism.Magnet import Magnet
 from simulation.tools.mesh_storage import save_mesh, test
 from simulation.tools.force_tables.main import main2
+from simulation.types import CarthesianCoordinates
 
 from pathlib import Path
 
@@ -36,34 +37,47 @@ def export_positions_to_csv(npz_path, csv_path=None):
 
     return csv_path
 
-main2()
+# main2()
 
 # CHECK:
 #  - Maybe the force-list is unnecessary
 #  - Check the interpolation method for multiple magnets and how interfer in HorizontalSurfaceMagnet's
 #    update_forces method
 
-# path = export_positions_to_csv("./src/data/meshes/test.npz")
-# print(f"CSV saved to: {path}")
+#FIXME it's rounding value to zero
 
-# test()
+path = export_positions_to_csv("./src/data/meshes/test_cylindrical_method.npz")
+print(f"CSV saved to: {path}")
+
+test()
 
 # test_magnet = Magnet(
 #     radius=10.0,
 #     thickness=5.0,
-#     magnetization=800_000.0
+#     magnetization=np.zeros(3),
+#     position=CarthesianCoordinates(x=0, y=0, z=0)
 # )
 
-# positions = test_magnet.mapping_pieces_magnet(n_pieces=9000)
-# l, w, h = test_magnet.piece_dimensions.values()
-# volume_by_piece = l*w*h
+# mapping = test_magnet.mapping_pieces_magnet_by_cilindral_method(n_pieces=1000)
+# test_magnet.set_magnet_map_in_carthesian_system(mapping=mapping)
+
+# positions = list()
+# volumes = list()
+# for piece in mapping:
+#     positions.append(
+#         piece.relative_position.cylindrical_2_carthesian()
+#     )
+
+#     volumes.append(
+#         piece.volume
+#     )
 
 # save_mesh(
-#     mesh_id='test',
+#     mesh_id='test_cylindrical_method',
 #     positions=positions,
 #     radius=test_magnet.radius,
 #     thickness=test_magnet.thickness,
 #     resolution=20,
 #     method='cartesian_grid',
-#     volume_by_position=volume_by_piece
+#     volumes=volumes
 # )

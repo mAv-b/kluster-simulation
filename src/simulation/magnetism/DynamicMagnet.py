@@ -2,9 +2,21 @@ import numpy as np
 
 from abc import ABC, abstractmethod
 
-from simulation.types import Vector3D, Force
+from typing import TYPE_CHECKING
+
 from .InterpolatedMagnet import InterpolatedMagnet
-from .tools.Interpolation import Interpolation
+
+if TYPE_CHECKING:
+    from simulation.types import (
+        Vector3D,
+        Force,
+        CarthesianCoordinates,
+        CylindricalCoordinates,
+        Coordinates3D
+    )
+    from ..Environment import Environment
+    from ..tools.Interpolation import Interpolation
+
 
 
 class DynamicMagnet(InterpolatedMagnet, ABC):
@@ -14,14 +26,15 @@ class DynamicMagnet(InterpolatedMagnet, ABC):
     forces_list:list[Force]
     net_force:Vector3D
     net_torque:Vector3D
-    trajectory: list[Vector3D]
+    trajectory: list[Coordinates3D]
 
     def __init__(
             self,
+            environment: Environment,
             radius: float,
             thickness: float,
             magnetization: Vector3D,
-            position: Vector3D,
+            position: Coordinates3D,
             mass: float,
             moment_of_inertia: float,
             interpolation: Interpolation
@@ -41,6 +54,7 @@ class DynamicMagnet(InterpolatedMagnet, ABC):
         self.net_torque = np.zeros(3)
 
         self.trajectory = list([self.position])
+        self.environment = environment
 
 
     @property
@@ -53,9 +67,9 @@ class DynamicMagnet(InterpolatedMagnet, ABC):
         return self.net_torque / self.moment_of_inertia
 
 
-    def add_force(self, force:Vector3D, body_point:Vector3D | None = None) -> Vector3D:
+    def add_force(self, force:Vector3D, body_point:Coordinates3D | None = None) -> Vector3D:
         if body_point is not None:
-            vector_displacement = body_point - self.position
+            vector_displacement = (body_point - self.position).to_vector3D()
             self.add_torque(
                 np.cross(vector_displacement, force)
             )
@@ -65,10 +79,11 @@ class DynamicMagnet(InterpolatedMagnet, ABC):
         return force
 
 
-    def register_force(self, name_force: str, force:Vector3D) -> None:
+    def register_force(self, name_force: str, force:Vector3D, body_point: Coordinates3D | None = None) -> None:
         self.forces_list.append({
             'force_name': name_force,
             'force_vector': force,
+            'body_point': body_point
         })
 
 
@@ -90,7 +105,7 @@ class DynamicMagnet(InterpolatedMagnet, ABC):
     @abstractmethod
     def update_forces(self, *args, **kwargs) -> list[Force]:
         # UPDATE THE FORCES IN MAGNET, FOR EACH dt MOVED
-        raise NotImplementedError
+        return NotImplemented
     
 
     def move_by_dt(self, dt:float):

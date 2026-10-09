@@ -1,6 +1,13 @@
 from .DynamicMagnet import DynamicMagnet
-from .types import Vector3D, Force
-from .tools.Interpolation import Interpolation
+from ..Environment import Environment
+from ..types import (
+    Vector3D,
+    Force,
+    CylindricalCoordinates,
+    CarthesianCoordinates,
+    Coordinates3D,
+)
+from ..tools.Interpolation import Interpolation
 
 import numpy as np
 
@@ -11,16 +18,18 @@ class HorizontalSurfaceMagnet(DynamicMagnet):
 
     def __init__(
         self,
+        environment: Environment, # check later
         radius: float,
         thickness: float,
         magnetization: Vector3D,
-        position: Vector3D,
+        position: Coordinates3D,
         mass: float,
         moment_of_inertia: float,
         interpolation: Interpolation
     ) -> None:
         
         super().__init__(
+            environment,
             radius,
             thickness,
             magnetization,
@@ -82,6 +91,23 @@ class HorizontalSurfaceMagnet(DynamicMagnet):
         return (-1) * normal_force_norm * self.u_kinetic_friction * (self.velocity / velocity_norm)
         
 
-    def update_forces(self, position) -> list[Force]:
-        #verify
-        pass
+    def update_forces(self) -> list[Force]:
+        self.reset_forces()
+
+        magnetic_forces = self.environment.magnetic_forces_on(self)
+
+        for magnetic_force in magnetic_forces:
+            magnetic_force_vector = magnetic_force['force_vector']
+            magnetic_force_name = magnetic_force['force_name']
+            magnetic_force_body_point = magnetic_force['body_point']
+
+            self.add_force(
+                force=magnetic_force_vector, body_point=magnetic_force_body_point)
+
+            self.register_force(
+                name_force=magnetic_force_name, force=magnetic_force_vector, body_point=magnetic_force_body_point)
+
+        self.add_force(force=self.friction_force)
+        self.register_force(name_force='friction', force=self.friction_force)
+
+        return self.forces_list

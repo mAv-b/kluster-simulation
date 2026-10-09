@@ -1,6 +1,11 @@
 from .Magnet import Magnet
-from .types import Vector3D
-from .tools.Interpolation import Interpolation
+from ..types import (
+    Vector3D,
+    CylindricalCoordinates,
+    CarthesianCoordinates,
+    Coordinates3D,
+)
+from ..tools.Interpolation import Interpolation
 
 class InterpolatedMagnet(Magnet):
     _magnetic_force: Vector3D
@@ -9,8 +14,8 @@ class InterpolatedMagnet(Magnet):
         self,
         radius: float, 
         thickness: float, 
-        magnetization: Vector3D, 
-        position: Vector3D,
+        magnetization: Vector3D,
+        position: Coordinates3D,
         interpolation: Interpolation
     ) -> None:
 
